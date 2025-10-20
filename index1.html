@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BananaFrame</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      text-align: center;
+      background: #fffbe6;
+      margin: 0;
+      padding: 20px;
+    }
+
+    #game-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    #board {
+      display: grid;
+      grid-template-columns: repeat(15, 50px);
+      grid-template-rows: repeat(15, 50px);
+      gap: 2px;
+      margin: 20px 0;
+      background: #fff;
+      padding: 10px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .cell {
+      width: 50px;
+      height: 50px;
+      background-color: #f0e68c;
+      border: 2px solid #ccc;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      transition: all 0.2s;
+    }
+
+    .cell:hover {
+      background-color: #e6d875;
+      border-color: #999;
+    }
+
+    .cell.selected {
+      background-color: #d4af37;
+      border-color: #333;
+      box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
+    }
+
+    #rack {
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .tile {
+      width: 50px;
+      height: 50px;
+      background-color: #ffeb3b;
+      border: 3px solid #333;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 20px;
+      cursor: pointer;
+      border-radius: 4px;
+      user-select: none;
+      transition: all 0.2s;
+    }
+
+    .tile:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .tile.selected {
+      background-color: #ff9800;
+      border-color: #000;
+      transform: scale(1.15);
+    }
+
+    h1 {
+      color: #333;
+      margin: 0 0 20px 0;
+    }
+
+    #instructions {
+      color: #666;
+      font-size: 14px;
+      margin-bottom: 10px;
+    }
+
+    #selected-tile {
+      height: 30px;
+      margin-bottom: 10px;
+      color: #333;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍌 BananaFrame</h1>
+  <div id="instructions">Click a tile from your rack, then click a board square to place it</div>
+  <div id="selected-tile"></div>
+  
+  <div id="game-container">
+    <div id="board"></div>
+    <div id="rack"></div>
+  </div>
+
+  <script>
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    const letterBag = alphabet.repeat(5).split("");
+    const rack = document.getElementById("rack");
+    const board = document.getElementById("board");
+    const selectedTileDisplay = document.getElementById("selected-tile");
+    
+    let selectedTile = null;
+    let boardCells = [];
+
+    // Create board
+    for (let i = 0; i < 15 * 15; i++) {
+      const cell = document.createElement("div");
+      cell.className = "cell";
+      cell.dataset.index = i;
+      
+      cell.onclick = () => {
+        if (selectedTile) {
+          cell.textContent = selectedTile.textContent;
+          selectedTile.remove();
+          selectedTile = null;
+          updateSelectedDisplay();
+          deselectAllTiles();
+        }
+      };
+      
+      board.appendChild(cell);
+      boardCells.push(cell);
+    }
+
+    // Generate 11 random tiles
+    for (let i = 0; i < 11; i++) {
+      const letter = letterBag.splice(Math.floor(Math.random() * letterBag.length), 1)[0];
+      const tile = document.createElement("div");
+      tile.className = "tile";
+      tile.textContent = letter;
+      tile.id = `tile-${i}`;
+      
+      tile.onclick = () => {
+        if (selectedTile === tile) {
+          selectedTile = null;
+          tile.classList.remove("selected");
+        } else {
+          deselectAllTiles();
+          selectedTile = tile;
+          tile.classList.add("selected");
+        }
+        updateSelectedDisplay();
+      };
+      
+      rack.appendChild(tile);
+    }
+
+    function deselectAllTiles() {
+      document.querySelectorAll(".tile").forEach(t => t.classList.remove("selected"));
+    }
+
+    function updateSelectedDisplay() {
+      if (selectedTile) {
+        selectedTileDisplay.textContent = `Selected: ${selectedTile.textContent} - Click a board square to place it`;
+      } else {
+        selectedTileDisplay.textContent = "";
+      }
+    }
+  </script>
+</body>
+</html>
